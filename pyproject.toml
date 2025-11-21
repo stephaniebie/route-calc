@@ -1,0 +1,21 @@
+[project]
+name = "route_calc"
+version = "0.0.1"
+description = "CU Boulder DTSC 5501 Group Project #3: Find the shortest route in a city"
+requires-python = ">=3.10"
+authors = [
+    { name = "Wesley Allen", email = "Wesley.Allen@colorado.edu" },
+    { name = "Chushmitha Battula", email = "Chushmitha.Battula@colorado.edu" },
+    { name = "Stephanie Bie", email = "Stephanie.Bie@colorado.edu" },
+    { name = "Glen Vadakkoott", email = "Glen.Vadakkoott@colorado.edu" },
+]
+dependencies = [
+    "ipykernel",
+    "jupyter",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
