@@ -34,6 +34,7 @@ pip install .
 Install the package in editable mode:
 
 ```bash
+pip install -e .
 pip install -e .[dev]
 ```
 

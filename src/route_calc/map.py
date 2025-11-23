@@ -6,14 +6,17 @@ class Map:
     An abstracted geographical map as an adjacency list.
     """
 
-    def __init__(self, time_units: str = "minutes"):
+    def __init__(self, time_units: str = "minutes", verbose: bool = False):
         """
         Parameters
         ----------
         time_units: str
             The units to use for tracking the route durations
+        verbose: bool
+            Toggles verbosity of print statements
         """
         self.time_units = time_units
+        self.verbose = verbose
         self._adjacency_list = {}
 
     def __repr__(self):
@@ -35,9 +38,13 @@ class Map:
         """
         # Adds starting location to adjacency list
         if start not in self._adjacency_list:
+            if self.verbose:
+                print(f"Starting location {start} not in map. Adding...")
             self._adjacency_list[start] = {}
         # Adds end location to adjacency list
         if end not in self._adjacency_list:
+            if self.verbose:
+                print(f"Ending location {end} not in map. Adding...")
             self._adjacency_list[end] = {}
         # Adds duration to adjacency list
         self._adjacency_list[start][end] = duration
@@ -66,6 +73,10 @@ class Map:
         locations = list(self._adjacency_list)
         durations = {loc: (0 if loc == start else float("inf")) for loc in locations}
         parent = {loc: None for loc in locations}
+        if self.verbose:
+            print(
+                f"Calculating durations from {start} to {end}.\nCurrent update:\n{durations}"
+            )
 
         while locations:
             # Calculate the location with the minimum duration
@@ -84,4 +95,6 @@ class Map:
                 if duration < durations[location]:
                     durations[location] = duration
                     parent[location] = min_duration_location
+                if self.verbose:
+                    print(f"Current update:\n{durations}")
         return durations[end]

@@ -25,7 +25,10 @@ def read_locations(path: str) -> list:
 
 
 def read_routes(
-    path: str, locations: list | None = None, time_units: str = "minutes"
+    path: str,
+    locations: list | None = None,
+    time_units: str = "minutes",
+    verbose: bool = False,
 ) -> Map:
     """
     Read a CSV into a Map object.
@@ -39,12 +42,14 @@ def read_routes(
         List of Location objects with additional information populated
     time_units: str
         The units to use for tracking the route durations
+    verbose: bool
+        Toggles verbosity of print statements
 
     Returns
     -------
     Map object
     """
-    points_of_interest = Map(time_units=time_units)
+    points_of_interest = Map(time_units=time_units, verbose=verbose)
     with open(path, "r") as f:
         for row in DictReader(f):
             # Configure start and end locations
