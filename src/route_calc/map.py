@@ -1,3 +1,4 @@
+from __future__ import annotations
 from route_calc.location import Location
 
 
@@ -20,7 +21,14 @@ class Map:
         self._adjacency_list = {}
 
     def __repr__(self):
-        return f"Map of {len(self._adjacency_list)} locations"
+        return f"Map of {len(self._adjacency_list)} locations and {sum([len(r.values()) for r in self._adjacency_list.values()])} possible routes"
+
+    def __eq__(self, other: Map):
+        if isinstance(other, Map):
+            return self._adjacency_list == other._adjacency_list
+        raise TypeError(
+            f"Cannot establish equality between Map and {type(other)} objects"
+        )
 
     def add_route(self, start: Location, end: Location, duration: float = 0.0):
         """

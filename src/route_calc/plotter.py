@@ -38,15 +38,21 @@ def plot_map(
                         lat=[starting_location.latitude, location.latitude],
                         lon=[starting_location.longitude, location.longitude],
                         mode="lines",
-                        line={"width": 1, "color": colorway[i % len(colorway)]},
+                        line=(
+                            {"width": 2, "color": "black"}
+                            if duration == float("inf")
+                            else {"width": 1, "color": colorway[i % len(colorway)]}
+                        ),
                         name=f"to {location.name}",
                         legendgroup=starting_location.name,
                         legendgrouptitle_text=starting_location.name,
+                        visible="legendonly" if duration == float("inf") else True,
                         hovertemplate=(
                             f"<b>{starting_location.name}</b><br>"
                             "Latitude: %{lat}<br>"
                             "Longitude: %{lon}<extra></extra>"
                         ),
+                        meta="BLOCKED" if duration == float("inf") else "",
                     )
                 )
                 traces.append(
@@ -54,18 +60,36 @@ def plot_map(
                         lat=[(starting_location.latitude + location.latitude) / 2],
                         lon=[(starting_location.longitude + location.longitude) / 2],
                         mode="markers+text",
-                        marker={"size": 0, "color": colorway[i % len(colorway)]},
-                        name=f"   Duration: {duration} {map.time_units}",
+                        marker=(
+                            {
+                                "size": 0,
+                                "color": (
+                                    "black"
+                                    if duration == float("inf")
+                                    else colorway[i % len(colorway)]
+                                ),
+                            }
+                        ),
+                        name=(
+                            "   BLOCKED"
+                            if duration == float("inf")
+                            else f"   Duration: {round(duration, 1)} {map.time_units}"
+                        ),
                         legendgroup=starting_location.name,
                         legendgrouptitle_text=starting_location.name,
                         visible=False,
-                        text=f"{duration} {map.time_units}",
+                        text=(
+                            "BLOCKED"
+                            if duration == float("inf")
+                            else f"{round(duration, 1)} {map.time_units}"
+                        ),
                         textposition="top center",
                         hovertemplate=(
                             f"Duration: {duration} {map.time_units}<br>"
                             "Latitude: %{lat}<br>"
                             "Longitude: %{lon}<extra></extra>"
                         ),
+                        meta="BLOCKED" if duration == float("inf") else "",
                     )
                 )
 
@@ -84,6 +108,32 @@ def plot_map(
         },
     )
     if show_edges is True:
+        buttons = [
+            dict(
+                label="Show Duration",
+                method="restyle",
+                args=[
+                    {
+                        "visible": [
+                            (
+                                False
+                                if "Duration" in t.name or "BLOCKED" in t.name
+                                else "legendonly" if t.meta == "BLOCKED" else True
+                            )
+                            for t in fig.data
+                        ]
+                    }
+                ],
+                args2=[
+                    {
+                        "visible": [
+                            ("legendonly" if t.meta == "BLOCKED" else True)
+                            for t in fig.data
+                        ]
+                    }
+                ],
+            )
+        ]
         fig.update_layout(
             updatemenus=[
                 dict(
@@ -93,21 +143,7 @@ def plot_map(
                     xanchor="left",
                     yanchor="bottom",
                     showactive=False,
-                    buttons=[
-                        dict(
-                            label="Show Duration",
-                            method="update",
-                            args=[
-                                {
-                                    "visible": [
-                                        False if "Duration" in t.name else True
-                                        for t in fig.data
-                                    ]
-                                }
-                            ],
-                            args2=[{"visible": True}],
-                        )
-                    ],
+                    buttons=buttons,
                 )
             ]
         )
