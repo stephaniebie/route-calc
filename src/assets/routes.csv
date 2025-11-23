@@ -1,0 +1,46 @@
+start,end,duration
+Fenway Park,Boston Public Garden,9
+Fenway Park,Old North Church,17
+Fenway Park,Faneuil Hall,14
+Fenway Park,Boston Common,10
+Fenway Park,Museum of Fine Arts Boston,7
+Fenway Park,Symphony Hall,7
+Fenway Park,Bunker Hill Monument,17
+Fenway Park,Massachusetts State House,12
+Fenway Park,Boston Tea Party Ships & Museum,18
+Boston Public Garden,Old North Church,8
+Boston Public Garden,Faneuil Hall,6
+Boston Public Garden,Boston Common,1
+Boston Public Garden,Museum of Fine Arts Boston,8
+Boston Public Garden,Symphony Hall,6
+Boston Public Garden,Bunker Hill Monument,8
+Boston Public Garden,Massachusetts State House,2
+Boston Public Garden,Boston Tea Party Ships & Museum,7
+Old North Church,Faneuil Hall,4
+Old North Church,Boston Common,7
+Old North Church,Museum of Fine Arts Boston,13
+Old North Church,Symphony Hall,12
+Old North Church,Bunker Hill Monument,4
+Old North Church,Massachusetts State House,7
+Old North Church,Boston Tea Party Ships & Museum,6
+Faneuil Hall,Boston Common,4
+Faneuil Hall,Museum of Fine Arts Boston,12
+Faneuil Hall,Symphony Hall,10
+Faneuil Hall,Bunker Hill Monument,6
+Faneuil Hall,Massachusetts State House,5
+Faneuil Hall,Boston Tea Party Ships & Museum,2
+Boston Common,Museum of Fine Arts Boston,9
+Boston Common,Symphony Hall,7
+Boston Common,Bunker Hill Monument,8
+Boston Common,Massachusetts State House,1
+Boston Common,Boston Tea Party Ships & Museum,5
+Museum of Fine Arts Boston,Symphony Hall,3
+Museum of Fine Arts Boston,Bunker Hill Monument,12
+Museum of Fine Arts Boston,Massachusetts State House,9
+Museum of Fine Arts Boston,Boston Tea Party Ships & Museum,11
+Symphony Hall,Bunker Hill Monument,12
+Symphony Hall,Massachusetts State House,9
+Symphony Hall,Boston Tea Party Ships & Museum,12
+Bunker Hill Monument,Massachusetts State House,10
+Bunker Hill Monument,Boston Tea Party Ships & Museum,8
+Massachusetts State House,Boston Tea Party Ships & Museum,5
