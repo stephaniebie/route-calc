@@ -85,10 +85,11 @@ def plot_map(
                         ),
                         textposition="top center",
                         hovertemplate=(
-                            f"Duration: {duration} {map.time_units}<br>"
-                            "Latitude: %{lat}<br>"
-                            "Longitude: %{lon}<extra></extra>"
-                        ),
+                            "BLOCKED<br>"
+                            if duration == float("inf")
+                            else f"Duration: {round(duration, 1)} {map.time_units}<br>"
+                        )
+                        + ("Latitude: %{lat}<br>" "Longitude: %{lon}<extra></extra>"),
                         meta="BLOCKED" if duration == float("inf") else "",
                     )
                 )
