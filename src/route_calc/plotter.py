@@ -6,6 +6,22 @@ import plotly.graph_objects as go
 def plot_map(
     map: Map, show_edges: bool = True, colorway: list = colors.qualitative.Plotly
 ) -> go.Figure:
+    """
+    Visualize a Map object.
+
+    Parameters
+    ----------
+    map: Map
+        A Map object
+    show_edges: bool
+        Toggles the edges between nodes
+    colorway: list
+        List of colors to use for each consecutive node (and edges)
+
+    Returns
+    -------
+    A Plotly Figure object
+    """
     traces = []
     for i, (starting_location, connecting_locations) in enumerate(
         map._adjacency_list.items()
@@ -139,8 +155,8 @@ def plot_map(
             updatemenus=[
                 dict(
                     type="buttons",
-                    x=1,
-                    y=1.05,
+                    x=1.01,
+                    y=1.02,
                     xanchor="left",
                     yanchor="bottom",
                     showactive=False,
