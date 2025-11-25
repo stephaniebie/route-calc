@@ -1,5 +1,6 @@
 import heapq
 import pandas as pd
+import random
 from pathlib import Path
 
 
@@ -13,6 +14,7 @@ def dijkstra(adj, src):
 
     while min_heap_priority_que:
         d, u = heapq.heappop(min_heap_priority_que)
+
         if d > distances_list[u]:
             continue
 
@@ -25,52 +27,102 @@ def dijkstra(adj, src):
     return distances_list, parent
 
 
-def get_path_names(parent, target_idx, ending_node):
+def get_path_names(parent, target_idx, idx_to_node_map):
+    if parent[target_idx] == -1 and target_idx not in parent:
+        return "No path found"
+
     path = []
     curr = target_idx
     while curr != -1:
-        path.append(ending_node[curr])
+        path.append(idx_to_node_map[curr])
         curr = parent[curr]
+
     return " -> ".join(path[::-1])
 
 
-script_dir = Path(__file__).parent
-csv_path = script_dir.parent / "assets" / "routes.csv"
-df = pd.read_csv(csv_path)
+def create_graph(df, node_to_idx, is_rush_hour=False):
+    num_nodes = len(node_to_idx)
+    adj = [[] for _ in range(num_nodes)]
+    risky_edge_indices = random.sample(range(len(df)), k=3)
 
-unique_nodes = sorted(list(set(df['start']) | set(df['end'])))
-starting_node = {name: i for i, name in enumerate(unique_nodes)}
-ending_node = {i: name for name, i in starting_node.items()}
+    for index, row in df.iterrows():
+        u = node_to_idx[row['start']]
+        v = node_to_idx[row['end']]
+        weight = row['duration']
 
-length_of_unique_nodes = len(unique_nodes)
-adj = [[] for _ in range(length_of_unique_nodes)]
+        # Applying rush hour multiplier based on the scenario
+        if is_rush_hour:
+            multiplier = random.normalvariate(2, 0.5)
+            multiplier = max(1, min(3, multiplier))
+            weight = weight * multiplier
 
-for _, row in df.iterrows():
-    u = starting_node[row['start']]
-    v = starting_node[row['end']]
-    w = row['duration']
+        # Applying extreme events; uncertainty
+        if index in risky_edge_indices:
+            if random.random() < 0.20:
+                weight = weight * 10
+                print(
+                    f"Extreme event on the edge: {row['start']} <-> {row['end']}")
+                print(f"Updated weight is: {weight:.2f} minutes")
 
-    adj[u].append((v, w))
-    adj[v].append((u, w))
+        adj[u].append((v, weight))
+        adj[v].append((u, weight))
 
-start_location = "Fenway Park"
-end_location = "Boston Tea Party Ships & Museum"
+    return adj
 
-starting_index = starting_node[start_location]
-ending_index = starting_node[end_location]
-
-distances, parents = dijkstra(adj, starting_index)
-
-
-print("just the best case scenario")
-print(f"From:{start_location}")
-print(f"To:{end_location}")
-print("-" * 30)
-print(f"Shortest Time: {distances[ending_index]} minutes")
-print(f"Optimal Route: {get_path_names(parents, ending_index, ending_node)}")
 
 if __name__ == "__main__":
-    test_adj = [[(1, 4), (2, 1)], [(2, 2)], []]
+    script_dir = Path(__file__).parent
+    csv_path = script_dir.parent / "assets" / "routes.csv"
 
-    source_node = 0
-    dijkstra(test_adj, source_node)
+    try:
+        df = pd.read_csv(csv_path)
+
+        unique_nodes = sorted(list(set(df['start']) | set(df['end'])))
+        node_to_idx = {name: i for i, name in enumerate(unique_nodes)}
+        idx_to_node = {i: name for name, i in node_to_idx.items()}
+
+        start_location = "Fenway Park"
+        end_location = "Boston Tea Party Ships & Museum"
+        src_idx = node_to_idx[start_location]
+        target_idx = node_to_idx[end_location]
+
+        print("Base case scenario:")
+
+        base_adj = create_graph(df, node_to_idx, is_rush_hour=False)
+
+        # A -> J
+        dists, parents = dijkstra(base_adj, src_idx)
+        print(f"\nDirection: {start_location} (A) -> {end_location} (J)")
+        print(f"Shortest time: {dists[target_idx]:.2f} minutes")
+        print(
+            f"Shortest Path: {get_path_names(parents, target_idx, idx_to_node)}")
+
+        # J -> A
+        dists_rev, parents_rev = dijkstra(base_adj, target_idx)
+        print(f"\nDirection: {end_location} (J) -> {start_location} (A)")
+        print(f"Shortest time: {dists_rev[src_idx]:.2f} minutes")
+        print(
+            f"Shortest Path: {get_path_names(parents_rev, src_idx, idx_to_node)}")
+
+        print("\nRush hour scenario:\n")
+
+        rush_adj = create_graph(df, node_to_idx, is_rush_hour=True)
+
+        # A -> J
+        rh_dists, rh_parents = dijkstra(rush_adj, src_idx)
+        print(f"\nDirection: {start_location} (A) -> {end_location} (J)")
+        print(f"Shortest time: {rh_dists[target_idx]:.2f} minutes")
+        print(
+            f"Shortest Path: {get_path_names(rh_parents, target_idx, idx_to_node)}")
+
+        # J -> A
+        rh_dists_rev, rh_parents_rev = dijkstra(rush_adj, target_idx)
+        print(f"\nDirection: {end_location} (J) -> {start_location} (A)")
+        print(f"Shortest time: {rh_dists_rev[src_idx]:.2f} minutes")
+        print(
+            f"Shortest Path: {get_path_names(rh_parents_rev, src_idx, idx_to_node)}")
+
+    except FileNotFoundError:
+        print(f"Error: Could not find CSV file at {csv_path}")
+    except KeyError as e:
+        print(f"Error: Node name not found in dataset: {e}")
