@@ -27,8 +27,8 @@ def rush_hour_graph(base_graph, mean=2.0, std=0.5):
             # If we haven't seen this edge before, we geneate a multiplier
             if edge_key not in edge_multipliers:
                 factor = random.normalvariate(mean, std)
-                # make the factor as a non-negative value
-                factor = max(factor, 1e-6)
+                # make sure the factor is between ranges 1-3
+                factor = max(1.0, min(3.0, factor))
                 edge_multipliers[edge_key] = factor
             else:
                 factor = edge_multipliers[edge_key]
