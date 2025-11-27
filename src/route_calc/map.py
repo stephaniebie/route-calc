@@ -1,4 +1,5 @@
 from __future__ import annotations
+import heapq
 from route_calc.location import Location
 
 
@@ -58,51 +59,92 @@ class Map:
         self._adjacency_list[start][end] = duration
         self._adjacency_list[end][start] = duration
 
-    def calculate_duration(self, start: Location | str, end: Location | str) -> float:
+    def calculate_duration(self, start: Location, end: Location) -> float:
         """
         Calculates the minimum duration required for a route using Dijkstra's algorithm.
 
         Parameters
         ----------
-        start: Location | str
+        start: Location
             Starting location
-        end: Location | str
+        end: Location
             Ending location
 
         Returns
         -------
         Minimum duration from start to end as a float
         """
-        # Assert that these events are in the map first
-        assert start in self._adjacency_list, f"{start.name} not in map"
-        assert end in self._adjacency_list, f"{end.name} not in map"
+        dist, prev = self._dijkstra(start=start, end=end)
+        return dist
 
-        # Create a set of unvisited locations
-        locations = list(self._adjacency_list)
-        durations = {loc: (0 if loc == start else float("inf")) for loc in locations}
-        parent = {loc: None for loc in locations}
-        if self.verbose:
-            print(
-                f"Calculating durations from {start} to {end}.\nCurrent update:\n{durations}"
-            )
+    def construct_path(self, start: Location, end: Location) -> list:
+        """
+        Reconstructs the path from start to end
 
-        while locations:
-            # Calculate the location with the minimum duration
-            min_duration_location = min(locations, key=lambda l: durations[l])
-            # Stop searching at end of the route
-            if min_duration_location == end:
-                break
-            # Move on to other locations after calculating the duration
-            locations.remove(min_duration_location)
+        Parameters
+        ----------
+        start: Location
+            Starting location
+        end: Location
+            Ending location
 
-            # Check neighboring locations for even shorter durations
-            for location, duration in self._adjacency_list[
-                min_duration_location
-            ].items():
-                duration += durations[min_duration_location]
-                if duration < durations[location]:
-                    durations[location] = duration
-                    parent[location] = min_duration_location
-                if self.verbose:
-                    print(f"Current update:\n{durations}")
-        return durations[end]
+        Returns
+        -------
+        List of locations from start to end
+        """
+        dist, prev = self._dijkstra(start=start, end=end)
+        path = []
+        cur = [n for n in self._adjacency_list if n == end][0]
+        while cur is not None:
+            path.append(cur)
+            cur = prev[cur]
+        path.reverse()
+        if path and path[0] == start:
+            return path
+        return []
+
+    def _dijkstra(self, start: Location, end: Location) -> tuple[float, dict]:
+        """
+        Implementation of Dijkstra's algorithm.
+
+        Parameters
+        ----------
+        start: Location
+            Starting location
+        end: Location
+            Ending location
+
+        Returns
+        -------
+        Minimum duration from start to end as a float
+        Previous node in shortest path as a dictionary
+        """
+        # Convert strings to Locations
+        start_node = [n for n in self._adjacency_list if n == start][0]
+        end_node = [n for n in self._adjacency_list if n == end][0]
+
+        distances = {node: float("inf") for node in self._adjacency_list}
+        distances[start_node] = 0
+        prev = {node: None for node in self._adjacency_list}
+        visited = set()
+        counter = 0
+        pq = [(0, counter, start_node)]
+
+        while pq:
+            curr_time, _, curr_node = heapq.heappop(pq)
+
+            if curr_node in visited:
+                continue
+            visited.add(curr_node)
+
+            if curr_node == end_node:
+                return curr_time, prev
+            for neighbor, weight in self._adjacency_list[curr_node].items():
+                if neighbor in visited:
+                    continue
+                total_time = curr_time + weight
+                if total_time < distances[neighbor]:
+                    distances[neighbor] = total_time
+                    prev[neighbor] = curr_node
+                    counter += 1
+                    heapq.heappush(pq, (total_time, counter, neighbor))

@@ -135,3 +135,47 @@ def test_calculate_duration():
     assert test_map.calculate_duration("0", "2") == 7
     assert test_map.calculate_duration("0", "3") == 9
     assert test_map.calculate_duration("0", "4") == 10
+
+
+def test_construct_path():
+    # Initialize Map object
+    test_map = Map()
+
+    # Create some Location objects
+    loc0 = Location(
+        name="0",
+        latitude=0,
+        longitude=0,
+    )
+    loc1 = Location(
+        name="1",
+        latitude=1,
+        longitude=1,
+    )
+    loc2 = Location(
+        name="2",
+        latitude=2,
+        longitude=2,
+    )
+    loc3 = Location(
+        name="3",
+        latitude=3,
+        longitude=3,
+    )
+    loc4 = Location(
+        name="4",
+        latitude=4,
+        longitude=4,
+    )
+    test_map.add_route(start=loc0, end=loc1, duration=4)
+    test_map.add_route(start=loc0, end=loc2, duration=8)
+    test_map.add_route(start=loc1, end=loc2, duration=3)
+    test_map.add_route(start=loc1, end=loc4, duration=6)
+    test_map.add_route(start=loc2, end=loc3, duration=2)
+    test_map.add_route(start=loc3, end=loc4, duration=10)
+
+    # Check shortest path is calculated correctly
+    assert test_map.construct_path(loc0, loc1) == [loc0, loc1]
+    assert test_map.construct_path(loc0, loc2) == [loc0, loc1, loc2]
+    assert test_map.construct_path(loc0, loc3) == [loc0, loc1, loc2, loc3]
+    assert test_map.construct_path(loc0, loc4) == [loc0, loc1, loc4]
