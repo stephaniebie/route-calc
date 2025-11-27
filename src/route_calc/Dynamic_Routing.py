@@ -18,56 +18,21 @@ def sample_event_edges(graph, num_events=3):
     edges = list(edges)
     return random.sample(edges, num_events)
 
-
-def sample_event_outcomes(event_edges, prob=0.2):
-    """
-    Generate an outcomes dict for the given event_edges.
-    This is useful when you want to apply the exact same random
-    realization to multiple graph variants (e.g. base and rush).
-    """
-    outcomes = {}
-    for i, edge in enumerate(event_edges):
-        if i == 0:
-            outcomes[edge] = {"action": "delay", "triggered": (random.random() < prob)}
-        else:
-            outcomes[edge] = {"action": "block", "triggered": (random.random() < prob)}
-    return outcomes
-
-def uncertain_events_on_edges(graph, event_edges, outcomes=None, prob=0.2):
-    """
-    Apply uncertain events to `graph` given `event_edges`.
-
-    - If `outcomes` is None, a new outcomes dict is sampled and used.
-      The outcomes dict maps each undirected edge tuple -> {"action":"delay"|"block", "triggered": bool}.
-    - If `outcomes` is provided, it must be in the same format and will
-      be used so multiple graphs (e.g. base and rush) can share the same
-      event realizations.
-    """
-    # If outcomes not provided, sample once here and reuse for both directions
-    if outcomes is None:
-        outcomes = {}
-        for i, edge in enumerate(event_edges):
-            if i == 0:
-                outcomes[edge] = {"action": "delay", "triggered": (random.random() < prob)}
-            else:
-                outcomes[edge] = {"action": "block", "triggered": (random.random() < prob)}
-
-    # Build new graph applying the pre-sampled outcomes symmetrically
+def uncertain_events_on_edges(graph, event_edges):
     new_graph = {u: [] for u in graph}
+    # Assign scenarios: one delay, two blockages; each with 20% chance per run
     for u in graph:
         for v, w in graph[u]:
             edge = tuple(sorted((u, v)))
-            outcome = outcomes.get(edge)
-            if outcome:
-                if outcome["action"] == "delay" and outcome["triggered"]:
-                    # apply severe delay
+            # Severe delay (10x) for the first edge, if its an event edge
+            if edge == event_edges[0]:
+                if random.random() < 0.2:
                     print(f"Severe delay on edge {edge}")
                     w = w * 10
-                elif outcome["action"] == "block" and outcome["triggered"]:
-                    # blocked edge: skip adding this directed entry (both
-                    # directions will be skipped because we use the same outcome
-                    # when we encounter the reverse edge)
-                    continue
+            # road blockages for the other 2 event edges, which means we skip adding them to the graph
+            if edge == event_edges[1] or edge == event_edges[2]:
+                print(f"Road blockage on edge {edge}")
+                if random.random() < 0.2:
+                    continue  # skipping this edge as a blockage
             new_graph[u].append((v, w))
-
     return new_graph

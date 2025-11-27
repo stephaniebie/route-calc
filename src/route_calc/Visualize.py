@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from Route import load_adjacencylist_from_csv
 from Map import rush_hour_graph, dijkstra_shortest_path, build_the_path
-from Dynamic_Routing import sample_event_edges, uncertain_events_on_edges, sample_event_outcomes
+from Dynamic_Routing import sample_event_edges, uncertain_events_on_edges
 
 def build_nx_graph(adj):
     G = nx.Graph()
@@ -20,7 +20,7 @@ def subplot_shortest_path(ax, graph, start, end, scenario_label, event_edges=Non
 
     nx.draw_networkx_nodes(G, pos, node_color="#89bdd3", node_size=300, ax=ax)
     nx.draw_networkx_labels(
-        G, pos, font_size=4, font_weight="semibold", font_color="#222", ax=ax
+        G, pos, font_size=5, font_weight="semibold", font_color="#222", ax=ax
     )
     nx.draw_networkx_edges(
         G, pos,
@@ -43,7 +43,6 @@ def subplot_shortest_path(ax, graph, start, end, scenario_label, event_edges=Non
 
     # Highlight chosen event edges' weights in red
     if event_edges:
-        print(event_edges)
         for u, v in G.edges():
             edge = tuple(sorted((u, v)))
             if edge in event_edges:
@@ -73,13 +72,10 @@ if __name__ == "__main__":
     end = "Massachusetts State House"
     rush_graph = rush_hour_graph(base_graph)
     event_edges = sample_event_edges(base_graph, 3)
-    #print(f"Selected event edges: {event_edges}")
-    # Sample outcomes once so base and rush graphs see the same event realization
-    outcomes = sample_event_outcomes(event_edges, prob=0.2)
-    #print(f"Event outcomes: {outcomes}")
-    dynamic_graph = uncertain_events_on_edges(base_graph, event_edges, outcomes=outcomes)
+    print(f"Selected event edges: {event_edges}")
+    dynamic_graph = uncertain_events_on_edges(base_graph, event_edges)
 
-    dynamic_rush_graph = uncertain_events_on_edges(rush_graph, event_edges, outcomes=outcomes)
+    dynamic_rush_graph = uncertain_events_on_edges(rush_graph, event_edges)
 
     # each page with the necessary graph and paths displayed
 
@@ -92,7 +88,6 @@ if __name__ == "__main__":
 
     # create single figure with two subplots (left/right)
     fig, axs = plt.subplots(1, 2, figsize=(14, 6))
-    # leave room at the bottom for buttons and page label
     plt.subplots_adjust(bottom=0.18, wspace=0.25)
 
     current = {"idx": 0}  # mutable container for closures
