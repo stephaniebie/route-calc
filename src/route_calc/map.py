@@ -59,15 +59,15 @@ class Map:
         self._adjacency_list[start][end] = duration
         self._adjacency_list[end][start] = duration
 
-    def calculate_duration(self, start: Location, end: Location) -> float:
+    def calculate_duration(self, start: Location | str, end: Location | str) -> float:
         """
         Calculates the minimum duration required for a route using Dijkstra's algorithm.
 
         Parameters
         ----------
-        start: Location
+        start: Location | str
             Starting location
-        end: Location
+        end: Location | str
             Ending location
 
         Returns
@@ -77,15 +77,15 @@ class Map:
         dist, prev = self._dijkstra(start=start, end=end)
         return dist
 
-    def construct_path(self, start: Location, end: Location) -> list:
+    def construct_path(self, start: Location | str, end: Location | str) -> list:
         """
         Reconstructs the path from start to end
 
         Parameters
         ----------
-        start: Location
+        start: Location | str
             Starting location
-        end: Location
+        end: Location | str
             Ending location
 
         Returns
@@ -103,15 +103,17 @@ class Map:
             return path
         return []
 
-    def _dijkstra(self, start: Location, end: Location) -> tuple[float, dict]:
+    def _dijkstra(
+        self, start: Location | str, end: Location | str
+    ) -> tuple[float, dict]:
         """
         Implementation of Dijkstra's algorithm.
 
         Parameters
         ----------
-        start: Location
+        start: Location | str
             Starting location
-        end: Location
+        end: Location | str
             Ending location
 
         Returns

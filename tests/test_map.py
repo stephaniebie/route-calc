@@ -174,6 +174,10 @@ def test_construct_path():
     test_map.add_route(start=loc2, end=loc3, duration=2)
     test_map.add_route(start=loc3, end=loc4, duration=10)
 
+    # Different types are valid
+    assert test_map.construct_path(loc0, loc2) == [loc0, loc1, loc2]
+    assert test_map.construct_path("0", "2") == [loc0, loc1, loc2]
+
     # Check shortest path is calculated correctly
     assert test_map.construct_path(loc0, loc1) == [loc0, loc1]
     assert test_map.construct_path(loc0, loc2) == [loc0, loc1, loc2]
