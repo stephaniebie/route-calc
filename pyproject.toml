@@ -12,6 +12,9 @@ authors = [
 dependencies = [
     "ipykernel",
     "jupyter",
+    "matplotlib",
+    "networkx",
+    "plotly",
 ]
 
 [project.optional-dependencies]
