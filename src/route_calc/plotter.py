@@ -284,9 +284,12 @@ def plot_route(
         )
 
         # Highlight chosen event edges' weights in red
-        event_edges = set(zip(path, path[1:]))
+        # event_edges = set(zip(path, path[1:]))
+        event_edges = set(frozenset((u, v)) for u, v in zip(path, path[1:]))
+
         for u, v in G.edges():
-            edge = tuple(sorted((u, v)))
+            #edge = tuple(sorted((u, v)))
+            edge = frozenset((u, v))
             if edge in event_edges:
                 x = (pos[u][0] + pos[v][0]) / 2
                 y = (pos[u][1] + pos[v][1]) / 2
